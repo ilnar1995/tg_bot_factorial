@@ -1,8 +1,10 @@
 from threading import Thread
+from telegram.ext import Updater, CommandHandler
 
+token = '6400511901:AAFcZLKloLe60r1L2IeKw1Gb4ALisyQRc4E'
 results = [1] * 2
-
 cache = {}
+
 
 def factorial(begin, n, thread, results):
     if n == begin:
@@ -22,12 +24,9 @@ def factorial(begin, n, thread, results):
     return result
 
 
-
-from telegram.ext import Updater, CommandHandler
-
-token = '6400511901:AAFcZLKloLe60r1L2IeKw1Gb4ALisyQRc4E'
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Привет! Введите число, чтобы посчитать факториал.")
+
 
 def factorial_command(update, context):
     try:
@@ -61,6 +60,7 @@ def factorial_command(update, context):
                 cache[number] = _factorial
 
             context.bot.send_message(chat_id=update.effective_chat.id, text=f"Факториал равен: {_factorial}")
+
 
 updater = Updater(token=token, use_context=True)
 dispatcher = updater.dispatcher
