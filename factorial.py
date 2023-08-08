@@ -32,32 +32,35 @@ def start(update, context):
 def factorial_command(update, context):
     try:
         number = int(context.args[0])
-
-        mid = number//2
-
-        if number in cache:
-            _factorial = cache[n]
-        else:
-            if number == 1:
-                results[0], results[1] = 1, 1
-            else:
-                thread1 = Thread(target=factorial, args=(1, mid, 'thread1', results))
-                thread2 = Thread(target=factorial, args=(mid+1, number, 'thread2', results))
-
-                # Запускаем потоки
-                thread1.start()
-                thread2.start()
-
-                # Ожидаем завершения потоков
-                thread1.join()
-                thread2.join()
-            _factorial = results[0] * results[1]
-            cache[number] = _factorial
-
-        context.bot.send_message(chat_id=update.effective_chat.id, text=f"Факториал равен: {_factorial}")
-
     except (ValueError, IndexError):
         context.bot.send_message(chat_id=update.effective_chat.id, text="Ошибка ввода! Введите целое число.")
+    else:
+
+        if number < 1 or number > 40:
+            context.bot.send_message(chat_id=update.effective_chat.id, text=f"Число должно быть положительным")
+        else:
+            mid = number // 2
+
+            if number in cache:
+                _factorial = cache[number]
+            else:
+                if number == 1:
+                    results[0], results[1] = 1, 1
+                else:
+                    thread1 = Thread(target=factorial, args=(1, mid, 'thread1', results))
+                    thread2 = Thread(target=factorial, args=(mid + 1, number, 'thread2', results))
+
+                    # Запускаем потоки
+                    thread1.start()
+                    thread2.start()
+
+                    # Ожидаем завершения потоков
+                    thread1.join()
+                    thread2.join()
+                _factorial = results[0] * results[1]
+                cache[number] = _factorial
+
+            context.bot.send_message(chat_id=update.effective_chat.id, text=f"Факториал равен: {_factorial}")
 
 updater = Updater(token=token, use_context=True)
 dispatcher = updater.dispatcher
