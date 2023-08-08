@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  program:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: factorial
+    command:  bash -c "python3 factorial.py"
+#    entrypoint: /usr/app/docker/entrypoint.sh
+    env_file:
+      - .env
+
+
+volumes:
+  postgres-data:
