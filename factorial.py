@@ -1,7 +1,9 @@
-from threading import Thread
-from telegram.ext import Updater, CommandHandler
+import os
 
-token = '6400511901:AAFcZLKloLe60r1L2IeKw1Gb4ALisyQRc4E'
+from threading import Thread
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+token = os.environ.get("token")
 results = [1] * 2
 cache = {}
 
@@ -30,16 +32,16 @@ def start(update, context):
 
 def factorial_command(update, context):
     try:
-        number = int(context.args[0])
+        number = int(update.message.text)
     except (ValueError, IndexError):
         context.bot.send_message(chat_id=update.effective_chat.id, text="Ошибка ввода! Введите целое число.")
     else:
 
         if number < 1 or number > 40:
-            context.bot.send_message(chat_id=update.effective_chat.id, text=f"Число должно быть положительным")
+            context.bot.send_message(chat_id=update.effective_chat.id, text=f"Число должно быть положительным и меньше 41")
         else:
             mid = number // 2
-
+            # проверяем кэш
             if number in cache:
                 _factorial = cache[number]
             else:
@@ -57,6 +59,7 @@ def factorial_command(update, context):
                     thread1.join()
                     thread2.join()
                 _factorial = results[0] * results[1]
+                # добавляем в кэш
                 cache[number] = _factorial
 
             context.bot.send_message(chat_id=update.effective_chat.id, text=f"Факториал равен: {_factorial}")
@@ -66,9 +69,11 @@ updater = Updater(token=token, use_context=True)
 dispatcher = updater.dispatcher
 
 start_handler = CommandHandler('start', start)
-factorial_handler = CommandHandler('factorial', factorial_command)
+factorial_handler = MessageHandler(Filters.text & ~Filters.command, factorial_command)
 
 dispatcher.add_handler(start_handler)
 dispatcher.add_handler(factorial_handler)
 
 updater.start_polling()
+updater.idle()
+
